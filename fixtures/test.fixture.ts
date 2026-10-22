@@ -46,10 +46,9 @@ export const test = base.extend<TestFixtures>({
         [customerData.email],
       );
 
-      await database.query(
-        'DELETE FROM customers WHERE email = $1',
-        [customerData.email],
-      );
+      await database.query('DELETE FROM customers WHERE email = $1', [
+        customerData.email,
+      ]);
     }
   },
 });
