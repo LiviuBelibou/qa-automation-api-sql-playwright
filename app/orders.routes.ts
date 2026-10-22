@@ -53,25 +53,23 @@ export function createOrdersRouter(database: Pool) {
     const orderData = validation.data;
 
     try {
-      const createdOrder = await withTransaction(
-        database,
-        async (client) => {
-          const orderResult = await client.query<OrderRow>(
-            `
+      const createdOrder = await withTransaction(database, async (client) => {
+        const orderResult = await client.query<OrderRow>(
+          `
               INSERT INTO orders (customer_id)
               VALUES ($1)
               RETURNING id, customer_id, status, currency, created_at
             `,
-            [orderData.customer_id],
-          );
+          [orderData.customer_id],
+        );
 
-          const order = orderResult.rows[0];
-          const savedItems: OrderItemRow[] = [];
-          let totalCents = 0;
+        const order = orderResult.rows[0];
+        const savedItems: OrderItemRow[] = [];
+        let totalCents = 0;
 
-          for (const item of orderData.items) {
-            const itemResult = await client.query<OrderItemRow>(
-              `
+        for (const item of orderData.items) {
+          const itemResult = await client.query<OrderItemRow>(
+            `
                 INSERT INTO order_items (
                   order_id,
                   product_name,
@@ -82,25 +80,19 @@ export function createOrdersRouter(database: Pool) {
                 RETURNING
                   id, order_id, product_name, quantity, unit_price_cents
               `,
-              [
-                order.id,
-                item.product_name,
-                item.quantity,
-                item.unit_price_cents,
-              ],
-            );
+            [order.id, item.product_name, item.quantity, item.unit_price_cents],
+          );
 
-            savedItems.push(itemResult.rows[0]);
-            totalCents += item.quantity * item.unit_price_cents;
-          }
+          savedItems.push(itemResult.rows[0]);
+          totalCents += item.quantity * item.unit_price_cents;
+        }
 
-          return {
-            ...order,
-            items: savedItems,
-            total_cents: totalCents,
-          };
-        },
-      );
+        return {
+          ...order,
+          items: savedItems,
+          total_cents: totalCents,
+        };
+      });
 
       response.status(201).json(createdOrder);
     } catch (error: unknown) {

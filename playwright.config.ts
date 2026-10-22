@@ -29,10 +29,7 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: 0,
 
-  reporter: [
-    ['list'],
-    ['html', { open: 'never' }],
-  ],
+  reporter: [['list'], ['html', { open: 'never' }]],
 
   use: {
     baseURL,

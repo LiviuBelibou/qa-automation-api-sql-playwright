@@ -2,11 +2,11 @@ services:
   db:
     image: postgres:17
     environment:
-      POSTGRES_DB: "${PGDATABASE:?Set PGDATABASE in .env}"
-      POSTGRES_USER: "${PGUSER:?Set PGUSER in .env}"
-      POSTGRES_PASSWORD: "${PGPASSWORD:?Set PGPASSWORD in .env}"
+      POSTGRES_DB: '${PGDATABASE:?Set PGDATABASE in .env}'
+      POSTGRES_USER: '${PGUSER:?Set PGUSER in .env}'
+      POSTGRES_PASSWORD: '${PGPASSWORD:?Set PGPASSWORD in .env}'
     ports:
-      - "127.0.0.1:${PGPORT:-5433}:5432"
+      - '127.0.0.1:${PGPORT:-5433}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database:/docker-entrypoint-initdb.d:ro

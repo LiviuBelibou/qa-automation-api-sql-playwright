@@ -16,12 +16,7 @@ const database = new Pool({
 
 const createCustomerSchema = z.strictObject({
   name: z.string().trim().min(1).max(100),
-  email: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .max(254)
-    .pipe(z.email()),
+  email: z.string().trim().toLowerCase().max(254).pipe(z.email()),
 });
 
 app.use(express.json());
@@ -71,11 +66,7 @@ app.post('/customers', async (request, response) => {
 
     response.status(201).json(result.rows[0]);
   } catch (error: unknown) {
-    if (
-      error instanceof Error &&
-      'code' in error &&
-      error.code === '23505'
-    ) {
+    if (error instanceof Error && 'code' in error && error.code === '23505') {
       response.status(409).json({
         error: 'A customer with this email already exists',
       });
